@@ -69,10 +69,14 @@ def main(in_directory):
 
 
     # Training / Validation 
+
+    num_samples = int( y.value_counts().mean() )
+
     # KFold Cross Validation ( expects the data to be shuffled )
 
     accuracy_scores = []
     f1_scores = []
+
 
     kf = KFold(n_splits = 5)
     # kf.split(X) returns the indices of the data that should be used for training and testing in each iteration
@@ -84,10 +88,18 @@ def main(in_directory):
 
         # Address Class imbalance
         # So we are going to use RandomOverSampler - Which automatically brings the minority class up But before we have to bring the majority down to the average 
+
+        # First Undersample the majority class
         # Find the number of samples we would need to bring the majority class down to the average
         num_samples = int( y_train.value_counts().mean() )
         # Find indices of the majority class
         majority_indices = y_train[y_train == 0].index
+        # Basically take the majority samples and sample len(y_train) - num_samples - this number of them
+        samples_to_drop = y_train[majority_indices].sample(len(y_train) - num_samples , rabdom_state = 1).index
+        X_train = X_train.drop(index = samples_to_drop)
+        y_train = y_train.drop(index = samples_to_drop)
+
+        # Oversample the minority class - Use RandomOverSampler
 
         # Fit the model for each fold
         model = build_pipeline()
