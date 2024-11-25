@@ -7,6 +7,22 @@ Project Overview
 This project utilizes a dataset of historical sales and active inventory records to build a machine learning model for predicting product sales (SoldFlag = 1). The goal is to assist in inventory decision-making by identifying products likely to sell versus those that should be removed.
 
 
+During Testings: 
+1. 
+When we only hot encoded the Marketing type we got a pretty bad F1 score and accuracy score of 83 % - which can be misleading because of the fact that we had 17% of the products were sold 
+the accuracy comes from only predicting the majority class ( Soldfalg = 0 )
+This is re-enforced by how the F1 score is so low i.e 24% basically indicating that we are not doing a well job at predicting the Positive class likely due to class imbalances 
+
+2. 
+Try Class Re-balancing 
+
+For SoldFlag = 0 we have 63 000 data points  
+For Sold Flag = 1.0 we have 12 996 data points
+
+We are going to use both Undersampling- Decrease Majority class and OverSampling - Increase  minority class 
+
+
+
 Dataset Description
 
 The dataset includes both historical sales data and active inventory. For this project:
