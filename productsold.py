@@ -86,6 +86,8 @@ def main(in_directory):
         X_train , X_test = X.iloc[train_idx, :] , X.iloc[test_idx, :]
         y_train , y_test = y.iloc[train_idx] , y.iloc[test_idx]
 
+        #########
+        
         # Address Class imbalance
         # So we are going to use RandomOverSampler - Which automatically brings the minority class up But before we have to bring the majority down to the average 
 
@@ -99,7 +101,11 @@ def main(in_directory):
         X_train = X_train.drop(index = samples_to_drop)
         y_train = y_train.drop(index = samples_to_drop)
 
-        # Oversample the minority class - Use RandomOverSampler
+        #  Use RandomOverSampler Oversample the minority class -
+        ros = RandomOverSampler(random_state=1)
+        X_train , y_train = ros.fit_resample(X_train , y_train)
+
+        #########
 
         # Fit the model for each fold
         model = build_pipeline()
