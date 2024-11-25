@@ -1,116 +1,122 @@
-Product Sales Prediction
+# Product Sales Prediction
 
-This project aims to predict whether a product will sell in the next six months based on historical sales data. By leveraging machine learning techniques, we analyze key product attributes to determine sales likelihood, providing actionable insights for inventory optimization.
+This project leverages historical sales data and machine learning techniques to predict whether a product will sell within the next six months. By analyzing product attributes, the model provides actionable insights for optimizing inventory, helping businesses decide which products to retain and which to remove.
 
-Project Overview
+---
 
-This project utilizes a dataset of historical sales and active inventory records to build a machine learning model for predicting product sales (SoldFlag = 1). The goal is to assist in inventory decision-making by identifying products likely to sell versus those that should be removed.
+## **Project Overview**
 
+The dataset contains both historical sales data and active inventory records. For this project:
+- **Objective:** Predict the `SoldFlag` (1 = sold, 0 = not sold) for historical products.
+- **Use Case:** Aid inventory decision-making by identifying products likely to sell versus those with low sales potential.
 
-During Testings: 
-1. 
-When we only hot encoded the Marketing type we got a pretty bad F1 score and accuracy score of 83 % - which can be misleading because of the fact that we had 17% of the products were sold 
-the accuracy comes from only predicting the majority class ( Soldfalg = 0 )
-This is re-enforced by how the F1 score is so low i.e 24% basically indicating that we are not doing a well job at predicting the Positive class likely due to class imbalances 
+Key challenges addressed in the project include:
+- Handling class imbalance, as only 17% of the historical products are marked as sold (`SoldFlag=1`).
+- Evaluating and improving the model's performance using techniques like k-fold cross-validation, class rebalancing, and feature engineering.
 
-2. 
-Try Class Re-balancing 
+---
 
-For SoldFlag = 0 we have 63 000 data points  
-For Sold Flag = 1.0 we have 12 996 data points
+## **Steps Taken**
 
-We are going to use both Undersampling- Decrease Majority class and OverSampling - Increase  minority class 
+### **1. Initial Data Preparation**
+- Filtered the dataset to include only historical records since active inventory does not contain sales information (`SoldFlag` and `SoldCount`).
+- Removed irrelevant columns like `Order`, `SoldCount`, and `File_Type`.
+- Shuffled the data to ensure it is evenly distributed for cross-validation.
+- Split the data into features (`X`) and target (`y`) variables:
+  - `X`: Contains product attributes used for prediction.
+  - `y`: Contains the binary target variable, `SoldFlag`.
 
-With this version we have :
-Accuracy:  0.7663166673015191
-F1:  0.4362355241494528
+---
 
-Which is a lot better 
+### **2. Addressing Class Imbalance**
+- The dataset was imbalanced, with 63,000 records for `SoldFlag=0` (majority class) and only 12,996 records for `SoldFlag=1` (minority class). This imbalance led to:
+  - A misleading accuracy of **83%**, as the model predominantly predicted the majority class.
+  - A low F1 score of **24%**, indicating poor performance in predicting the minority class.
 
-3. Try putting the ReleaseNumber - column as a categorical feature as well - So basically one hot encode it as well 
+**Solution:**
+- Combined **undersampling** and **oversampling**:
+  1. **Undersampling** reduced the majority class to the average size of the two classes.
+  2. **Oversampling** increased the minority class to match the reduced majority class using the `RandomOverSampler` from `imbalanced-learn`.
 
-Because we are thinking about taking it as a non-ordinal groupings eg different product lines ( As the Kaggle data set didn't provide any information about this column)
-When we weren't doing this we thought of it as something Ordinal - and treated it as numeric. This basically meant if the release number 
+**Impact:**
+- Improved performance with:
+  - Accuracy: **76.63%**
+  - F1 Score: **43.62%**
 
-Represented a progression eg newer releases means higher number - it could relate to newer - technology , better performance and hence more sold 
-Why Does This Matter in a Random Forest Model?
+---
 
-Random Forests and Categorical Data:
-	•	Random forests can handle numeric features well, but numeric encoding can misrepresent categorical data.
-	•	For example, treating ReleaseNumber as numeric might lead the model to assume that ReleaseNumber=10 is twice as impactful as ReleaseNumber=5, which may not make sense.
-Benefit of One-Hot Encoding:
-	•	By one-hot encoding, you allow the model to consider each ReleaseNumber as an independent feature.
-	•	This removes any artificial relationships imposed by the numeric representation, making it easier for the model to focus on the actual patterns in the data.
+### **3. Feature Engineering**
+- **Marketing Type:** One-hot encoded, as it is a binary categorical variable (`D` and `F`).
+- **Release Number:** Initially treated as a numeric (ordinal) feature. Later, it was one-hot encoded to better capture its categorical nature.
+  - **Why One-Hot Encode?**
+    - The `ReleaseNumber` column likely represents distinct product lines or versions, not a progressive ordinal feature.
+    - One-hot encoding eliminates the assumption that higher numbers (e.g., `10 > 5`) imply better or newer releases.
+  - **Impact:** Further improved accuracy and F1 score:
+    - Accuracy: **77.14%**
+    - F1 Score: **43.70%**
 
-Trade-Offs of One-Hot Encoding
+---
 
-Advantages:
-	•	Captures non-linear relationships between categories.
-	•	Eliminates incorrect assumptions about ordinal relationships.
-Disadvantages:
-	•	Increases dimensionality (number of features), especially if there are many unique ReleaseNumber values.
-	•	May require additional memory and computation.
+## **Challenges Faced**
 
+1. **Class Imbalance:**
+   - Predicting the positive class (`SoldFlag=1`) was challenging due to the dataset's imbalance.
+   - Balancing the classes using undersampling and oversampling significantly improved the F1 score.
 
-Accuracy:  0.7713564128180178
-F1:  0.4370438839808893
+2. **Feature Representation:**
+   - Deciding how to encode features like `ReleaseNumber` involved assumptions about the data's nature (ordinal vs. categorical).
+   - Experimentation showed that treating `ReleaseNumber` as categorical (via one-hot encoding) yielded better results.
 
-- Result for doing Release Number as one hot encoded also increased the accuracy 
--------
+3. **Model Evaluation:**
+   - High accuracy in initial tests masked the model's inability to predict the minority class accurately.
+   - Using the F1 score as the evaluation metric provided a more balanced view of the model's performance.
 
-Dataset Description
+---
 
-The dataset includes both historical sales data and active inventory. For this project:
-	•	Only historical data is used, as active inventory lacks the target column SoldFlag.
-	•	The dataset includes:
-	•	Product identifiers and attributes.
-	•	Sales data for the past 6 months.
-	•	A binary target variable (SoldFlag) indicating whether a product sold during that period.
+## **Model Evaluation**
 
-Key Columns:
-	•	SKU_number: Unique product identifier.
-	•	File_Type: Indicates whether the record is historical or active.
-	•	SoldFlag: Target variable (1 = sold, 0 = not sold).
-	•	SoldCount: Number of items sold (removed to avoid data leakage).
-	•	MarketingType: Categorical variable for product marketing strategy.
-	•	ReleaseNumber: Release version of the product.
-	•	StrengthFactor and PriceReg: Numerical attributes representing product characteristics.
+- **Metrics Used:**
+  - **Accuracy:** Measures the overall percentage of correct predictions but can be misleading in imbalanced datasets.
+  - **F1 Score:** Balances precision and recall, focusing on the positive class (`SoldFlag=1`).
 
+- **Results:**
+  - After addressing class imbalance and refining feature engineering:
+    - Accuracy: **77.14%**
+    - F1 Score: **43.70%**
 
-Key Objectives
+---
 
-	1.	Predictive Modeling:
-	•	Build a classification model to predict SoldFlag.
-	2.	Class Imbalance Handling:
-	•	Address the imbalance (only ~17% products sold) using techniques like oversampling and undersampling.
-	3.	Performance Evaluation:
-	•	Use metrics like F1 Score and Accuracy to assess model performance.
-	4.	Insights for Inventory Optimization:
-	•	Provide probability scores for each product to aid decision-making.
+## **Code Structure**
 
+1. **Data Preprocessing:**
+   - Filtered historical data.
+   - Dropped irrelevant columns.
+   - Applied one-hot encoding for categorical features (`MarketingType` and `ReleaseNumber`).
+   - Addressed class imbalance using undersampling and oversampling.
 
-Techniques and Tools
+2. **Pipeline Construction:**
+   - Used `ColumnTransformer` to preprocess categorical columns.
+   - Built a pipeline combining preprocessing steps and a `RandomForestClassifier`.
 
-Tools
+3. **Model Training and Validation:**
+   - Used **k-fold cross-validation** (5 folds) to:
+     - Split data into training and testing sets.
+     - Train the model on each fold and evaluate performance metrics.
+   - Ensured robust evaluation by averaging scores across folds.
 
-	•	Languages: Python
-	•	Libraries:
-	•	Data Manipulation: Pandas, NumPy
-	•	Data Preprocessing: Scikit-learn, Imbalanced-learn
-	•	Modeling: Scikit-learn (Random Forest Classifier)
-	•	Evaluation: Cross-validation, Accuracy, F1 Score
+---
 
-Techniques
+## **Conclusion**
 
-	1.	Data Preprocessing:
-	•	Dropped irrelevant columns (Order, SKU_number, SoldCount).
-	•	Handled categorical variables using binary encoding and one-hot encoding.
-	•	Addressed missing values by filtering historical records.
-	2.	Class Imbalance Handling:
-	•	Combined Random Oversampling and Undersampling to balance the dataset.
-	3.	Modeling:
-	•	Used a Random Forest Classifier for robust predictions.
-	•	Built a pipeline integrating preprocessing and modeling steps.
-	4.	Evaluation:
-	•	Performed K-Fold Cross-Validation to assess model performance.
-	•	Focused on F1 Score for imbalanced classification.
+This project successfully demonstrates the use of machine learning to predict product sales likelihood based on historical data. By addressing key challenges such as class imbalance and feature engineering, the final model achieved improved performance metrics. 
+
+While the results are promising, further steps, such as experimenting with more advanced models or collecting additional data, could enhance predictions.
+
+---
+
+## **How to Run**
+
+1. Clone the repository and navigate to the project directory.
+2. Install the required dependencies:
+3. run the script:
+    python productsold.py SalesKaggle3.csv
