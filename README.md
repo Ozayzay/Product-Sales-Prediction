@@ -21,7 +21,42 @@ For Sold Flag = 1.0 we have 12 996 data points
 
 We are going to use both Undersampling- Decrease Majority class and OverSampling - Increase  minority class 
 
+With this version we have :
+Accuracy:  0.7663166673015191
+F1:  0.4362355241494528
 
+Which is a lot better 
+
+3. Try putting the ReleaseNumber - column as a categorical feature as well - So basically one hot encode it as well 
+
+Because we are thinking about taking it as a non-ordinal groupings eg different product lines ( As the Kaggle data set didn't provide any information about this column)
+When we weren't doing this we thought of it as something Ordinal - and treated it as numeric. This basically meant if the release number 
+
+Represented a progression eg newer releases means higher number - it could relate to newer - technology , better performance and hence more sold 
+Why Does This Matter in a Random Forest Model?
+
+Random Forests and Categorical Data:
+	•	Random forests can handle numeric features well, but numeric encoding can misrepresent categorical data.
+	•	For example, treating ReleaseNumber as numeric might lead the model to assume that ReleaseNumber=10 is twice as impactful as ReleaseNumber=5, which may not make sense.
+Benefit of One-Hot Encoding:
+	•	By one-hot encoding, you allow the model to consider each ReleaseNumber as an independent feature.
+	•	This removes any artificial relationships imposed by the numeric representation, making it easier for the model to focus on the actual patterns in the data.
+
+Trade-Offs of One-Hot Encoding
+
+Advantages:
+	•	Captures non-linear relationships between categories.
+	•	Eliminates incorrect assumptions about ordinal relationships.
+Disadvantages:
+	•	Increases dimensionality (number of features), especially if there are many unique ReleaseNumber values.
+	•	May require additional memory and computation.
+
+
+Accuracy:  0.7713564128180178
+F1:  0.4370438839808893
+
+- Result for doing Release Number as one hot encoded also increased the accuracy 
+-------
 
 Dataset Description
 

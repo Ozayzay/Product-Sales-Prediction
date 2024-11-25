@@ -37,14 +37,19 @@ def preprocess(data):
 
 def build_pipeline():
 
-    nominal_transformer = Pipeline(steps=[
+    binary_transformer = Pipeline(steps=[
         ('onehot', OneHotEncoder( sparse_output = False , drop= "if_binary" ))
+    ])
+
+    nominal_transformer = Pipeline(steps=[
+        ('onehot', OneHotEncoder( sparse_output = False , handle_unknown= 'ignore' ))
     ])
 
     # ColumnTransformer lets you apply different transformations to different columns in the dataset
     # Remainder = 'passthrough' will pass the columns that were not transformed because by default the columns that were not transformed are dropped
     preprocessor = ColumnTransformer ( transformers = [
-        ('nominal' , nominal_transformer , ['MarketingType'])
+        ('nominal' , nominal_transformer , ['ReleaseNumber']),
+        ("binary" , binary_transformer , ['MarketingType'])
     ], remainder = 'passthrough')
 
 
@@ -87,7 +92,7 @@ def main(in_directory):
         y_train , y_test = y.iloc[train_idx] , y.iloc[test_idx]
 
         #########
-        
+
         # Address Class imbalance
         # So we are going to use RandomOverSampler - Which automatically brings the minority class up But before we have to bring the majority down to the average 
 
@@ -97,7 +102,7 @@ def main(in_directory):
         # Find indices of the majority class
         majority_indices = y_train[y_train == 0].index
         # Basically take the majority samples and sample len(y_train) - num_samples - this number of them
-        samples_to_drop = y_train[majority_indices].sample(len(y_train) - num_samples , rabdom_state = 1).index
+        samples_to_drop = y_train[majority_indices].sample(len(y_train) - num_samples , random_state = 1).index
         X_train = X_train.drop(index = samples_to_drop)
         y_train = y_train.drop(index = samples_to_drop)
 
